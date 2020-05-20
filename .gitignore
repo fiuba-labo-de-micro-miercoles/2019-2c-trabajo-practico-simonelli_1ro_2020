@@ -1,0 +1,9 @@
+# ignore hex an obj
+*.hex
+*.obj
+*.sh
+*.asmproj
+*.xml
+*DEBUG*
+*DS_Store*
+*.atsln
