@@ -21,14 +21,14 @@ main:
 
                 ldi         r20, portb_conf         ; Set port b conf
                 out         DDRB, r20               ; Set potb b conf
-				ldi         r20, pin_button         ; Set pullup resistor for the input pin
-				out         PORTB, r20              ; Set pullup resistor for the input pin
+                ldi         r20, pin_button         ; Set pullup resistor for the input pin
+                out         PORTB, r20              ; Set pullup resistor for the input pin
 
-				ldi         r21, pin_button         ; Set r21 a mask in order to read only one bit
-read:			in          r20, PINB               ; Read portb
-				and         r20, r21                ; and with the mask
+                ldi         r21, pin_button         ; Set r21 a mask in order to read only one bit
+read:           in          r20, PINB               ; Read portb
+                and         r20, r21                ; and with the mask
                 breq        led_on                  ; if z flag is seted the port was low, so the switch is pushed
-         		cbi         PORTB, pin_led          ; led off
-				jmp         read                    ; goto red
+                cbi         PORTB, pin_led          ; led off
+                jmp         read                    ; goto red
 led_on:         sbi         PORTB, pin_led          ; led on
                 jmp         read                    ; goto red
