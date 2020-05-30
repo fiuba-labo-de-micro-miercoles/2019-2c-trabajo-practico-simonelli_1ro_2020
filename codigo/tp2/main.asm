@@ -28,6 +28,6 @@ read:           in          r20, PINB               ; Read portb
                 and         r20, r21                ; and with the mask
                 breq        led_on                  ; if z flag is setted the port was low, so the switch is pushed
                 cbi         PORTB, pin_led          ; led off
-                jmp         read                    ; goto red
+                jmp         read                    ; goto read
 led_on:         sbi         PORTB, pin_led          ; led on
-                jmp         read                    ; goto red
+                jmp         read                    ; goto read
