@@ -60,7 +60,6 @@ loop:           call    switch_led                  ; Switch led1 state
                 reti
 
 
- reti
 
  ; turns on the led 1 if it is turned off and vice versa 
 switch_led:
