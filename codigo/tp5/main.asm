@@ -19,6 +19,10 @@ main:
                 ldi         r20, LOW(RAMEND)        ; Load r20 with the last ram address lower byte
                 out         spl, r20                ; Load lower byte in sp with r20
 
+				ldi         r20, 0x3f
+				out         PORTB, r20              ; Set the b port pin 
+                out         DDRB, r20               ; Set the same port pin as output and input all others
+
 			    ldi         r22, 0xFE
 				out         DDRC, r22
 				
@@ -32,42 +36,12 @@ main:
 				lds         r22, ADCSRA
 				ori         r22, 0x40
 				sts         ADCSRA, r22             ; start conversion 
-                ldi         r20, init_mask          ; Set b port with the bound value
-right:          lsr         r20                     ; right shift ... 010000 -> 001000
-                out         PORTB, r20              ; Set the b port pin 
-                out         DDRB, r20               ; Set the same port pin as output and input all others 
-                cpi         r20, end_mask           ; Compare with the bound value
-                breq        left                    ; If bound value has been reached start to shift to the other side
-                call        delay                   ; Delay
-                jmp         right                   ; Go to right
-left:			lsl         r20                     ; left shift... 000001 -> 000010
-                cpi         r20, init_mask          ; Compare to the left bound value
-                breq        right                   ; If bound value has been reached start to shift to the other side
-                call        delay                   ; Delay
-                out         PORTB, r20              ; Set the b port pin 
-                out         DDRB, r20               ; Set the same port pin as output and input all others 
-                jmp         left                    ; Goto left
+                
+loop:     		
+				jmp         loop     
 
 
 adc_isr:
 				lds         r16, ADCH
+				out         PORTB, r16
 				reti
-
-delay:                                              ; Delay procedure
-                push        r20                     ; Save the r20 value in the stack 
-                push        r21                     ; Save the r21 value in the stack
-                push        r22                     ; Save the r22 value in the stack
-				mov         r22, r16                 ;
-loop1:          ldi         r21, 50                 ;
-loop2:          ldi         r20, 100                ;
-loop3:          dec         r20                     ; decrement r20 by 1
-                brne        loop3                   ; If r20 had reached 0, z flag would have been seted
-                                                    ; and we will jump to loop 3
-                dec         r21                     ; The same as above
-                brne        loop2
-                dec         r22
-                brne        loop1
-                pop         r22                     ; Set r22, r21, r20 to the same value that
-                pop         r21                     ; it had before entere this proc
-                pop         r20
-                ret                                 ; go back to main
