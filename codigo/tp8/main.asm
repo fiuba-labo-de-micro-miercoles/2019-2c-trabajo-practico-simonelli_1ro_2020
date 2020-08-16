@@ -54,9 +54,9 @@ main:
                 call    print_greeting_msg                                 ; Pints a gretting
 receive:        call    ask_for_input                                      ; Asks for input
                 call    USART_Receive                                      ; Reads input, lets in r16
-                call    trate_input                                        ; Transforms ascci input in a number, lets that in r17
+                call    trate_input                                        ; Transforms ascii input in a number, lets that in r17
                 brts    error                                              ; input error
-                call    toggle_led                                         ; Togle the led, reads the number from r17
+                call    toggle_led                                         ; Toggle the led, reads the number from r17
                 jmp     receive                                            ; asks for another input
 error:          call    print_error_input_msg                              ; Shows error message
                 jmp     receive                                            ; Asks for another input
@@ -79,9 +79,9 @@ trate_input:
                 brlt    input_error                                        ;   the lowest accepted 
                 cpi     r16, BIGGESTINPUTVALUE + 1                         ; Verifies that the input number is lower than 
                 brsh    input_error                                        ;   the bigger accepted
-                mov     r17, r16                                           ; copyes r16 inbto r17
-                subi    r17, '0'                                           ; Transfors an ascii into a number
-                clt                                                        ; Clears t flag, the input was valid, and could be transfomed
+                mov     r17, r16                                           ; copies r16 into r17
+                subi    r17, '0'                                           ; Transforms an ascii into a number
+                clt                                                        ; Clears t flag, the input was valid, and could be transformed
                 ret 
 input_error:    set                                                        ; Sets t flag, the input was invalid
                 ret
