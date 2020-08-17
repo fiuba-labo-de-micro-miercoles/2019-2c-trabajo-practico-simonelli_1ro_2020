@@ -43,11 +43,11 @@ configuracion:
 
 main:
                 in      dummyreg, PIND                    ; Read port D
-                andi    dummyreg, 0x0c                    ; this is actually unnessesary, but clear info 
+                andi    dummyreg, 0x0c                    ; this is actually unnecessary, but clear info 
                                                           ; that coul be added by mistake
                 ldi     zl, low(i00)                      ; Loads Z with the first position of the table
-                ldi     zh, high(i00)                     ; Multiply by 2 is not necesary in this case
-                                                          ;   icall is world adressed
+                ldi     zh, high(i00)                     ; Multiply by 2 is not necessary in this case
+                                                          ;   icall is world addressed
                 add     zl, dummyreg                      ; Ads tableposition + (input selection)
                 ldi     dummyreg, 0                       ;   ( see table definition )
                 adc     zh, dummyreg                      ;
@@ -56,7 +56,7 @@ main:
                 sts     TIMSK1 , timer_on                 ; Sets new timer status (on or off)
                 jmp     main                              ; loop
 
-; Each entry in this table weiths 8 bytes (4 worlds) and represents an user selection
+; Each entry in this table weights 8 bytes (4 worlds) and represents an user selection
 ; After execute any of this entries both prescaler and time_on will be loaded
 i00:            ldi     timer_on, 0                       ; time
                 cbi     PORTB, 1
