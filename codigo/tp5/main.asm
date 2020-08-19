@@ -1,18 +1,14 @@
-; knight rider lights
 .include "m328pdef.inc"                             ; Valid definitions to 238p
-
-.equ init_mask = 0x40                               ; pin connected to the input switch 
-.equ end_mask = 0x01                                ; pin connected to the input switch 
 
 .org 0x000                                          ; The next instruction has to be written to add 0x0000
 
-                rjmp        main                    ; Relative jump to main
+                rjmp       config                   ; Relative jump to main
 .org 0x002A
 			    rjmp       adc_isr
 
 .org INT_VECTORS_SIZE                               ; inter vector
                                                     
-main:
+config:
 				 
                 ldi         r20, HIGH(RAMEND)       ; Load r20 with the last ram address higher byte
                 out         sph, r20                ; Load higher byte in sp with r20
@@ -32,13 +28,9 @@ main:
                 sts         ADMUX, r22
 
                 sei
-
-                lds         r22, ADCSRA
-                ori         r22, 0x40
-                sts         ADCSRA, r22             ; start conversion 
-                
-loop:     		
-                jmp         loop     
+               
+main:     		
+                jmp         main     
 
 
 adc_isr:
