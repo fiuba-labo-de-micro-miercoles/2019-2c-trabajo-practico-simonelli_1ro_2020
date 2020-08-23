@@ -22,7 +22,7 @@ main:
                 ldi         r22, 0xfb               ; Port c.2 as input
                 out         DDRC, r22               ;
 
-                ldi         r22, (1 << ADLAR | 0 << MUX1)
+                ldi         r22, (1 << ADLAR | 1 << MUX1)
                 sts         ADMUX, r22
 
                 ldi         r22, ( 1 << ADEN | 1 << ADSC)
