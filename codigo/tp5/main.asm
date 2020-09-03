@@ -7,6 +7,7 @@
 
                 rjmp        main                    ; Relative jump to main
 
+
 .org INT_VECTORS_SIZE                               ; inter vector
                                                     
 main:
@@ -19,35 +20,43 @@ main:
                 ldi         r20, 0x3f               ; Set port d.0 d.1 d.2 d.3 d.4 d.5 as output 
                 out         DDRD, r20               ; 
                 
-                ldi         r22, 0xfb               ; Port c.2 as input
-                out         DDRC, r22               ;
+                ldi         r20, 0xfb               ; Port c.2 as input
+                out         DDRC, r20               ;
 
-                ldi         r22, (1 << ADLAR | 1 << MUX1)
-                sts         ADMUX, r22
-
-                ldi         r22, ( 1 << ADEN | 1 << ADSC)
-                sts         ADCSRA, r22
-
-
-
-                
+                                                    ; Set channel 2, ADLAR (data in adch), Vcc as reference
+                ldi         r20, (1 << ADLAR | 1 << MUX1  | 1 << REFS0)
+                sts         ADMUX, r20
+                                                    ; ADEN adc enable
+                                                    ; ADCS start convertion
+                                                    ; adpsx = 111 division factor in 128
+                ldi         r20, ( 1 << ADEN | 1 << ADSC | 1 << ADPS2 | 1 << ADPS2 | 1 << ADPS2)
+                sts         ADCSRA, r20
+              
 loop:
-                lds         r22, ADCSRA             ; Reads adcsra
-                ori         r22, (1 << ADSC)        ; set adsc
-                sts         ADCSRA, r22             ;
-                lds         r16, ADCH               ; reads adc value
-                out         PORTD, r16              ; write this value iun portb
-                jmp         loop     
+                call        convertion_start        ; Starts convertion
+                call        convertion_wait         ; Waits the convertion to complete
+                call        adc_read                ; let value in r16
+                out         PORTD, r16              ; writes this value in portd
+                
+                jmp loop
 
 
-adc_isr:
+convertion_wait:
+                lds         r16, ADCSRA             ; polls ADIE until convertion is complete
+                sbrs        r16, 4                  ; 
+                jmp         convertion_wait         ; 
+                ret
+
+convertion_start:
+                ldi         r16, (1 << ADSC)        ; Trigger convertion
+                lds         r17, ADCSRA             ;
+                or          r17, r16                ;
+                sts         ADCSRA, r17             ;
+                ret
+
+adc_read:
                 lds         r16, ADCH               ; reads adc value
                 lsr         r16                     ; 63/255 aprox 4
                 lsr         r16                     ; divide by 4
-                andi        r16, 0x3f
-                in          r17, PORTD
-                andi        r17, 0xc0
-                and         r16, r17
-                out         PORTD, r16              ; write this value iun portb
-                reti
+                ret
 
