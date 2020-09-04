@@ -10,11 +10,14 @@
 .def dummyreg = r21
 .def prescaler = r22
 .def timer_on = r23
-.equ TIMER_COUNT = 0xf9e6 
+.def post_value = r19
+.def input = r18
+
+.equ TIMER_COUNT = 0xf9e6                                  ; 1 second aprox
 
 .cseg 
 .org 0x0000
-            jmp		configuracion
+            jmp     configuracion
 .org OVF1addr
             jmp     isr_timovf1
 
@@ -43,13 +46,11 @@ configuracion:
                 sei
 
 main:
-                in      dummyreg, PIND                    ; Read port D
-                andi    dummyreg, 0x0c                    ; this is actually unnecessary, but clear info 
-                                                          ; that coul be added by mistake
                 ldi     zl, low(i00)                      ; Loads Z with the first position of the table
                 ldi     zh, high(i00)                     ; Multiply by 2 is not necessary in this case
                                                           ;   icall is world addressed
-                add     zl, dummyreg                      ; Ads tableposition + (input selection)
+                call    read_input                        ; reads input, treates bounce, stores data in input var
+                add     zl, input                         ; Ads tableposition + (input selection)
                 ldi     dummyreg, 0                       ;   ( see table definition )
                 adc     zh, dummyreg                      ;
                 icall                                     ; calls whatever z is pointing to
@@ -97,4 +98,27 @@ toggle_led:
                 pop     r16                               ; restore r16
                 ret
 
-                     
+read_input:
+                in      input, PIND                    ; Read port D
+                call    delay                          ; Delay waiting for portd to change (debounce)
+                in      post_value, PIND               ; Read port D
+                cp      input, post_value              ; If this values are differente, 
+                brne    read_input                     ;    could indicate that this is bouncing
+                andi    input, 0x0c                    ; this is actually unnecessary, but clear info
+                ret
+
+
+; Delay function from tp1 (ligth version)
+delay:                                                 ; Delay procedure
+                push    r20                            ; Save the r20 value in the stack 
+                push    r22                            ; Save the r22 value in the stack
+                ldi     r22, 40                        ; 
+loop1:          ldi     r20, 40                        ;
+loop2:          dec     r20                            ; decrement r20 by 1
+                brne    loop2                          ; If r20 had reached 0, z flag would have been seted
+                                                       ;   and we will jump to loop 2
+                dec     r22                            ; The same as above
+                brne    loop1     
+                pop     r22                            ; it had before entere this proc
+                pop     r20     
+                ret                                    ; go back to main
