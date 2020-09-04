@@ -10,6 +10,7 @@
 .def dummyreg = r21
 .def prescaler = r22
 .def timer_on = r23
+.equ TIMER_COUNT = 0xf9e6 
 
 .cseg 
 .org 0x0000
@@ -78,9 +79,9 @@ i11:            ldi     prescaler, ( 1<<CS10 | 1<<CS12 )  ; time
 isr_timovf1:
 
                 call    toggle_led                        ; Switch led1 state
-                ldi     r24, high(63974)                  ; Sets value into tcnt1 that makes 
+                ldi     r24, high(TIMER_COUNT)            ; Sets value into tcnt1 that makes 
                 sts     TCNT1H,  r24                      ; timer 1 overflows every 1 second aprox
-                ldi     r24, low(63974)                   ;
+                ldi     r24, low(TIMER_COUNT)             ;
                 sts     TCNT1L,  r24                      ;
                 reti
 
